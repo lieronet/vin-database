@@ -1,0 +1,6 @@
+@vin_db_HostAddress = http://localhost:5101
+
+GET {{vin_db_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
