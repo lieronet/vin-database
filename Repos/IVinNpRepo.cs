@@ -1,7 +1,10 @@
-﻿namespace vin_db.Repos
+﻿using vin_db.Models;
+
+namespace vin_db.Repos
 {
     public interface IVinNpRepo
     {
-        public Task<>
+        public Task<VinDetailModel> GetVinRecord(string vin);
+        public Task<IEnumerable<VinRecordDataModel>> SearchVinRecords(int pageIndex, int pageSize, DateTime? modifiedAfter, int? dealerId);
     }
 }

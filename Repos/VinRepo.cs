@@ -1,6 +1,6 @@
 ﻿namespace vin_db.Repos
 {
-    public class VinRepo
+    public class VinRepo : IVinRepo
     {
     }
 }

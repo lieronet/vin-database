@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Linq;
 using System.Threading.Tasks;
+using vin_db.Models;
 using vin_db.Services;
 
 namespace vin_db.Controllers
@@ -9,45 +12,42 @@ namespace vin_db.Controllers
     public class VinController : ControllerBase
     {
         private readonly IVinService _vinService;
+        private readonly Configuration _appConfig;
 
-        public VinController(IVinService vinService)
+        public VinController(IVinService vinService, IOptions<Configuration> appConfig)
         {
             _vinService = vinService;
+            _appConfig = appConfig.Value;
         }
         [HttpPost]
         public async Task<IActionResult> UploadVins([FromBody] string csvVinList)
         {
-            var vinList = await _vinService.Parse(csvVinList);
-            //parse csv into object
-            //run validation
-                //VIN regex
-                //valid date range
-                //all fields present
-                //dealerId check?
-            //record validation failures
-            //insert validation successes to queue table
+            if (System.IO.File.Exists(_appConfig.TestFile))
+            {
+                csvVinList = System.IO.File.ReadAllText(_appConfig.TestFile);
+            }
 
-            var validationResponse = await _vinService.Validate(vinList);
+            var parseResponse = await _vinService.Parse(csvVinList);
 
-            vinList.RemoveAll(x => validationResponse.InvalidVins.Contains(x.Vin));
+            parseResponse.VinRecords.RemoveAll(x => parseResponse.Errors.Where(y=>!string.IsNullOrEmpty(y.Vin)).Select(y=>y.Vin).Contains(x.Vin));
 
-            await _vinService.InsertVinRecords(vinList);
+            await _vinService.InsertVinList(parseResponse.VinRecords);
 
             await _vinService.SaveCsv(csvVinList);
 
-            return Ok(validationResponse.ResponseMessage);
+            return Ok(parseResponse.Errors);
         }
 
         [HttpGet]
         [Route("/{vin}")]
-        public IActionResult GetVinData(string vin)
+        public async Task<IActionResult> GetVinData(string vin)
         {
-            if (!_vinService.ValidateVin(vin))
+            if ( !await _vinService.ValidateVin(vin))
             {
                 return BadRequest("Invalid VIN");
             }
 
-            var response = _vinService.GetVinData(vin);
+            var response = _vinService.GetVinRecord(vin);
 
             if(response == null)
             {
@@ -66,8 +66,10 @@ namespace vin_db.Controllers
         {
             if (pageSize < 0) return BadRequest("Page size should be a positive integer");
             if (pageIndex < 0) return BadRequest("Page number should be a positive integer");
+            if(dealerId!= null && dealerId > 99999) return BadRequest("DealerId should be a maximum of five digits");
+            if(modifiedAfter != null && modifiedAfter > DateTime.Now) return BadRequest("Modified date should be less than current date");
 
-            return Ok(await _vinService.SearchVins(pageIndex,pageSize, modifiedAfter, dealerId));
+            return Ok(await _vinService.SearchVinRecords(pageIndex,pageSize, modifiedAfter, dealerId));
         }
     }
 }

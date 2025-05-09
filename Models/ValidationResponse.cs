@@ -3,6 +3,6 @@
     public class ValidationResponse
     {
         public List<string> InvalidVins { get; set; }
-        public string ResponseMessage {  get; set; }
+        public List<Tuple<string,string>> ResponseMessage {  get; set; }
     }
 }
