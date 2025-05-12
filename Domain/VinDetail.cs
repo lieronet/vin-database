@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using vin_db.Models;
 
 namespace vin_db.Domain
 {
@@ -9,7 +10,6 @@ namespace vin_db.Domain
         public string Vin { get; set; }
         public int DealerId { get; set; }
         public DateTime ModifiedDate { get; set; }
-        public bool InUse { get; set; }
-        public DateTime? ProcessedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }

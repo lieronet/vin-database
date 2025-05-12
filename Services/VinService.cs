@@ -28,7 +28,7 @@ namespace vin_db.Services
 
         public async Task InsertVinList(List<VinRecordDataModel> vinRecords)
         {
-            return await _vinRepo.InsertVinList(vinRecords);
+            await _vinRepo.InsertVinList(vinRecords);
         }
 
         public async Task<ParseResponse> Parse(string csvVinList)
@@ -36,11 +36,12 @@ namespace vin_db.Services
             var result = new ParseResponse
             {
                 VinRecords = [],
-                Valid = false
+                Valid = false,
+                Errors = new List<ErrorRecord>()
             };
 
             var extraColumnDetected = false;
-            using var parser = new TextFieldParser(csvVinList);
+            using var parser = new TextFieldParser(new StringReader(csvVinList));
 
             parser.TextFieldType = FieldType.Delimited;
             parser.SetDelimiters(",");
@@ -59,7 +60,6 @@ namespace vin_db.Services
                         LineNumber= line,
                         Error = "Missing column. Skipping record."
                     });
-
                 }
 
                 if (fields.Length > 3 && !extraColumnDetected)
@@ -72,7 +72,7 @@ namespace vin_db.Services
                     });
                 }
                 //headers
-                if (line == 0 && !int.TryParse(fields[0], out var _))
+                if (line == 1 && !int.TryParse(fields[0], out var _))
                 {
                     if (fields[0].ToLower() != "dealerid" 
                         || fields[1].ToLower() != "vin" 
@@ -87,6 +87,8 @@ namespace vin_db.Services
 
                         return result;
                     }
+
+                    continue;
                 }
 
                 //just making sure the VIN is VIN-shaped
@@ -173,6 +175,6 @@ namespace vin_db.Services
             return new VinSearchResults(_config.ApiBaseUrl, pageSize, pageIndex, vinRecords, modifiedAfter, dealerId);
         }
 
-        public async Task<bool> ValidateVin(string vin) => !Regex.Match(vin, "[A-HJ-NPR-Z0-9]{17}").Success;
+        public async Task<bool> ValidateVin(string vin) => Regex.Match(vin, "[A-HJ-NPR-Z0-9]{17}").Success;
     }
 }

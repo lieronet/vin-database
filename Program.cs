@@ -3,6 +3,7 @@ using vin_db.Models;
 using vin_db.Repos;
 using vin_db.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace vin_db
 {
@@ -26,6 +27,8 @@ namespace vin_db
 
             // Add services to the container.
 
+            builder.Services.AddSerilog();
+
             builder.Services.Configure<Configuration>(builder.Configuration.GetSection(Configuration.Section));
 
             builder.Services.AddScoped<IVinService, VinService>();
@@ -45,7 +48,7 @@ namespace vin_db
 
                 var context = services.GetRequiredService<VinDbContext>();
                 context.Database.EnsureCreated();
-                // DbInitializer.Initialize(context);
+                //DbInitializer.Initialize(context);
             }
 
             // Configure the HTTP request pipeline.
