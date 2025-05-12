@@ -4,6 +4,10 @@ using vin_db.Repos;
 using vin_db.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyModel;
+using Serilog.Extensions.Logging;
+using Serilog.Settings.Configuration;
 
 namespace vin_db
 {
@@ -27,13 +31,30 @@ namespace vin_db
 
             // Add services to the container.
 
-            builder.Services.AddSerilog();
+            //builder.Services.AddSerilog();
+
+            builder.Services.AddSingleton<ILoggerProvider>(sp =>
+            {
+                var functionDependencyContext = DependencyContext.Load(typeof(Program).Assembly);
+
+                var hostConfig = sp.GetRequiredService<IConfiguration>();
+                var options = new ConfigurationReaderOptions(functionDependencyContext) { SectionName = "Serilog" };
+                var logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(hostConfig, options)
+                    .CreateLogger();
+
+                return new SerilogLoggerProvider(logger, dispose: true);
+            });
 
             builder.Services.Configure<Configuration>(builder.Configuration.GetSection(Configuration.Section));
+            builder.Services.Configure<VinQueueConfiguration>(builder.Configuration.GetSection(VinQueueConfiguration.Section));
 
+            builder.Services.AddScoped<IVinQueueService, VinQueueService>();
             builder.Services.AddScoped<IVinService, VinService>();
             builder.Services.AddScoped<IVinNpRepo, VinNpRepo>();
             builder.Services.AddScoped<IVinRepo, VinRepo>();
+
+            builder.Services.AddHostedService<VinQueueHostService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
