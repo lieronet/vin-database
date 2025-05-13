@@ -19,5 +19,7 @@ namespace vin_db.Domain
         public string Vin { get; set; }
         public int DealerId { get; set; }
         public DateTime ModifiedDate { get; set; }
+        public Guid? InUseBy { get; set; }
+        public DateTime? InUseDate { get; set; }
     }
 }

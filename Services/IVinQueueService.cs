@@ -1,7 +1,12 @@
-﻿namespace vin_db.Services
+﻿using vin_db.Domain;
+
+namespace vin_db.Services
 {
     public interface IVinQueueService
     {
-        Task Foo();
+        Task<IEnumerable<VinQueue>> GetQueue(Guid batch, int takeSize);
+        Task InsertProcessedRecords(IEnumerable<VinDetail> records);
+        Task<IEnumerable<VinDetail>> ProcessRecords(IEnumerable<VinQueue> records);
+        Task RollbackFailedBatch(Guid batch);
     }
 }

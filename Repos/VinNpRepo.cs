@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using vin_db.Domain;
 using vin_db.Models;
 
 namespace vin_db.Repos
@@ -12,6 +13,19 @@ namespace vin_db.Repos
         public VinNpRepo(IOptions<Configuration> appConfig)
         {
             _connectionString = appConfig.Value.ConnectionString;
+        }
+
+        public async Task<IEnumerable<VinQueue>> GetQueuedRecords(Guid batch)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                var sql = @"
+SELECT DISTINCT  Vin, DealerId, ModifiedDate
+FROM    VinQueue
+WHERE   InUseBy = @batch
+";
+                return await conn.QueryAsync<VinQueue>(sql, new { batch });
+            }
         }
 
         public async Task<VinDetailModel> GetVinRecord(string vin)

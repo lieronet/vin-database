@@ -42,12 +42,12 @@ namespace vin_db.Controllers
         [Route("/{vin}")]
         public async Task<IActionResult> GetVinData(string vin)
         {
-            if ( !await _vinService.ValidateVin(vin))
+            if ( !_vinService.ValidateVin(vin))
             {
                 return BadRequest("Invalid VIN");
             }
 
-            var response = _vinService.GetVinRecord(vin);
+            var response = await _vinService.GetVinRecord(vin);
 
             if(response == null)
             {

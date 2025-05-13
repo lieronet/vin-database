@@ -95,7 +95,7 @@ namespace vin_db.Services
                 //doing full validation on the VIN seems to require an API hit somewhere
                 //so we're going to roll that into the step that hits the government's API
 
-                if (!await ValidateVin(fields[1]))
+                if (!ValidateVin(fields[1]))
                 {
                     result.Errors.Append(new ErrorRecord
                     {
@@ -175,6 +175,6 @@ namespace vin_db.Services
             return new VinSearchResults(_config.ApiBaseUrl, pageSize, pageIndex, vinRecords, modifiedAfter, dealerId);
         }
 
-        public async Task<bool> ValidateVin(string vin) => Regex.Match(vin, "[A-HJ-NPR-Z0-9]{17}").Success;
+        public bool ValidateVin(string vin) => Regex.Match(vin, "[A-HJ-NPR-Z0-9]{17}").Success;
     }
 }

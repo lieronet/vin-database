@@ -20,22 +20,35 @@ namespace vin_db.Services
         {
             _logger.LogInformation("VinQueueHostService is starting.");
 
-            _timer = new Timer(ProcessQueue, null, 0, _queueConfig.IntervalMilliseconds);
+            //_timer = new Timer(ProcessQueue, null, 0, _queueConfig.IntervalMilliseconds);
+
+            ProcessQueue(null);
 
             return Task.CompletedTask;
         }
 
-        private void ProcessQueue(object? state)
+        private async void ProcessQueue(object? state)
         {
             _logger.LogInformation("Attempting to do the thing");
 
-            using (var scope = _services.CreateScope())
+            //very open to the possibility there's a better way here
+            using var scope = _services.CreateScope();
+            var queueProcessor = scope.ServiceProvider.GetRequiredService<IVinQueueService>();
+            var batchName = Guid.NewGuid();
+
+            try
             {
-                var queueProcessor = scope.ServiceProvider.GetRequiredService<IVinQueueService>();
+                var queueItems = await queueProcessor.GetQueue(batchName, _queueConfig.BatchSize);
 
-                _logger.LogInformation("created the thing");
+                var processedVins = await queueProcessor.ProcessRecords(queueItems);
+            }
+            catch
+            {
 
-                queueProcessor.Foo(); 
+            }
+            finally
+            {
+                await queueProcessor.RollbackFailedBatch(batchName);
             }
         }
 

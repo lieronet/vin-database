@@ -31,8 +31,6 @@ namespace vin_db
 
             // Add services to the container.
 
-            //builder.Services.AddSerilog();
-
             builder.Services.AddSingleton<ILoggerProvider>(sp =>
             {
                 var functionDependencyContext = DependencyContext.Load(typeof(Program).Assembly);
@@ -51,8 +49,10 @@ namespace vin_db
 
             builder.Services.AddScoped<IVinQueueService, VinQueueService>();
             builder.Services.AddScoped<IVinService, VinService>();
+
             builder.Services.AddScoped<IVinNpRepo, VinNpRepo>();
             builder.Services.AddScoped<IVinRepo, VinRepo>();
+            builder.Services.AddScoped<INhtsaRepository, NhtsaRepository>();
 
             builder.Services.AddHostedService<VinQueueHostService>();
 
