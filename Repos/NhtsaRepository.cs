@@ -11,7 +11,7 @@ namespace vin_db.Repos
         {
             _logger = logger;
         }
-        public async Task<List<DecodedVin>> GetVinData(List<string> vins)
+        public async Task<IEnumerable<DecodedVin>> GetVinData(IEnumerable<string> vins)
         {
             var restClient = new RestClient("https://vpic.nhtsa.dot.gov/api/");
 

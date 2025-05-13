@@ -8,5 +8,6 @@ namespace vin_db.Services
         Task InsertProcessedRecords(IEnumerable<VinDetail> records);
         Task<IEnumerable<VinDetail>> ProcessRecords(IEnumerable<VinQueue> records);
         Task RollbackFailedBatch(Guid batch);
+        Task ClearReservedQueueRecords(Guid batch);
     }
 }

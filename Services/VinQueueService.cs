@@ -22,6 +22,11 @@ namespace vin_db.Services
             this.nhtsaRepository = nhtsaRepository;
         }
 
+        public async Task ClearReservedQueueRecords(Guid batch)
+        {
+            await vinRepo.ClearReservedQueueRecords(batch);
+        }
+
         public async Task<IEnumerable<VinQueue>> GetQueue(Guid batch, int takeSize)
         {
             await vinRepo.CleanAndReserveQueue(takeSize, batch);
@@ -38,17 +43,24 @@ namespace vin_db.Services
         {
             var results = new List<VinDetail>();
 
-            var apiResults = new List<DecodedVin>();
+            var dict = records.ToDictionary(x=> x.Vin, x => x);
 
-            while (records.Any())
+            var page = 0;
+
+            while (records.Count() > page * 50)
             {
-                var data = await nhtsaRepository.GetVinData
-                    (records.Select(r => r.Vin)
-                    .Take(records.Count() > 50 ? 50 : records.Count()).ToList());
+                var takeSize = records.Count() - (page * 50);
+                if (takeSize > 50) takeSize = 50;
 
-                apiResults.AddRange(data);            
+                var vins = records.Skip(page * 50)
+                    .Take(takeSize)
+                    .Select(r => r.Vin);
 
-                data.RemoveRange(0, data.Count > 50 ? 50 : data.Count());
+                var data = await nhtsaRepository.GetVinData(vins);
+
+                results.AddRange(data.Select(x => new VinDetail(x, dict[x.VIN])));
+
+                page++;
             }
 
             return results;

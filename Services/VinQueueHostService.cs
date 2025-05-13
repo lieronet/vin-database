@@ -20,9 +20,9 @@ namespace vin_db.Services
         {
             _logger.LogInformation("VinQueueHostService is starting.");
 
-            //_timer = new Timer(ProcessQueue, null, 0, _queueConfig.IntervalMilliseconds);
+            _timer = new Timer(ProcessQueue, null, 0, _queueConfig.IntervalMilliseconds);
 
-            ProcessQueue(null);
+            //ProcessQueue(null);
 
             return Task.CompletedTask;
         }
@@ -40,11 +40,17 @@ namespace vin_db.Services
             {
                 var queueItems = await queueProcessor.GetQueue(batchName, _queueConfig.BatchSize);
 
-                var processedVins = await queueProcessor.ProcessRecords(queueItems);
-            }
-            catch
-            {
+                if (!queueItems.Any()) return;
 
+                var processedVins = await queueProcessor.ProcessRecords(queueItems);
+
+                await queueProcessor.InsertProcessedRecords(processedVins);
+
+                await queueProcessor.ClearReservedQueueRecords(batchName);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing the queue: {Message}", ex.Message);
             }
             finally
             {

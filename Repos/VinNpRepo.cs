@@ -32,7 +32,7 @@ WHERE   InUseBy = @batch
         {
             using(var conn = new SqlConnection(_connectionString))
             {
-                var sql = "SELECT * FROM VinRecords WHERE Vin = @vin";
+                var sql = "SELECT * FROM VinDetail WHERE Vin = @vin";
 
                 return (await conn.QueryAsync<VinDetailModel>(sql, new { vin })).FirstOrDefault();
             }
@@ -44,7 +44,7 @@ WHERE   InUseBy = @batch
             {
                 var sql = @"
 SELECT  Vin, DealerId, ModifiedDate
-FROM    VinRecords
+FROM    VinDetail
 WHERE   (@modifiedAfter IS NULL OR ModifiedDate > @modifiedAfter)
 AND     (@dealerId IS NULL OR DealerId = @dealerId)
 ORDER BY Id

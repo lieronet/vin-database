@@ -5,6 +5,6 @@ namespace vin_db.Repos
 {
     public interface INhtsaRepository
     {
-        public Task<List<DecodedVin>> GetVinData(List<string> vins);
+        public Task<IEnumerable<DecodedVin>> GetVinData(IEnumerable<string> vins);
     }
 }
