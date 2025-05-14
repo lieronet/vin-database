@@ -20,12 +20,14 @@ namespace vin_db.Controllers
             _appConfig = appConfig.Value;
         }
         [HttpPost]
-        public async Task<IActionResult> UploadVins([FromBody] string csvVinList)
+        public async Task<IActionResult> UploadVins([FromForm] string? csvVinList)
         {
             if (System.IO.File.Exists(_appConfig.TestFile))
             {
                 csvVinList = System.IO.File.ReadAllText(_appConfig.TestFile);
             }
+
+            if (string.IsNullOrWhiteSpace(csvVinList)) return BadRequest("CSV data must be provided");
 
             var parseResponse = await _vinService.Parse(csvVinList);
 
@@ -59,6 +61,7 @@ namespace vin_db.Controllers
         }
 
         [HttpGet]
+        [Route("/search")]
         public async Task<IActionResult> SearchVinData(DateTime? modifiedAfter,
             int? dealerId,
             int pageSize = 25, 
