@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using vin_db.Repos;
 
@@ -11,9 +12,11 @@ using vin_db.Repos;
 namespace vin_db.Migrations
 {
     [DbContext(typeof(VinDbContext))]
-    partial class VinDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250514190536_AddVinDetailColumns")]
+    partial class AddVinDetailColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,28 +30,32 @@ namespace vin_db.Migrations
                     b.Property<string>("Vin")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("BedLength")
+                    b.Property<int>("BedLength")
                         .HasColumnType("int");
 
                     b.Property<string>("BodyClass")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CustomMotorcycleType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DealerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("Doors")
+                    b.Property<int>("Doors")
                         .HasColumnType("int");
 
                     b.Property<string>("ErrorCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ErrorText")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Id")
@@ -58,45 +65,52 @@ namespace vin_db.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Make")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Manufacturer")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ModelYear")
+                    b.Property<int>("ModelYear")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("MotorcycleChassisType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("NumberOfWheels")
+                    b.Property<int>("NumberOfWheels")
                         .HasColumnType("int");
 
                     b.Property<string>("Series")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("TrackWidth")
+                    b.Property<decimal>("TrackWidth")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("VehicleType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("WheelBaseFrom")
+                    b.Property<decimal>("WheelBaseFrom")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal?>("WheelBaseTo")
+                    b.Property<decimal>("WheelBaseTo")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("WheelBaseType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Windows")
+                    b.Property<int>("Windows")
                         .HasColumnType("int");
 
                     b.HasKey("Vin");

@@ -1,10 +1,11 @@
-﻿using vin_db.Domain;
+﻿using RestSharp;
+using vin_db.Domain;
 using vin_db.Models;
 
 namespace vin_db.Repos
 {
     public interface INhtsaRepository
     {
-        public Task<IEnumerable<DecodedVin>> GetVinData(IEnumerable<string> vins);
+        public Task<BatchVinDecodeModel> GetVinData(IEnumerable<string> vins);
     }
 }

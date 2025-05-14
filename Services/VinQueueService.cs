@@ -58,7 +58,9 @@ namespace vin_db.Services
 
                 var data = await nhtsaRepository.GetVinData(vins);
 
-                results.AddRange(data.Select(x => new VinDetail(x, dict[x.VIN])));
+                //do some validation on the top-level results
+
+                results.AddRange(data.Results.Select(x => new VinDetail(x, dict[x.VIN])));
 
                 page++;
             }
